@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Alqawiperfumes — e-commerce site on Cloudflare Pages
 
 Static frontend (vanilla HTML/CSS/JS) + Cloudflare Pages Functions API + D1 database. Deploys as one Cloudflare Pages project, entirely on Cloudflare's free tier at this site's scale.
@@ -64,3 +65,7 @@ No analytics, remote fonts or external asset dependencies are included. Selectio
 
 ## Verification
 Checked all 15 cards and image loading, matching product-detail bottle/background, desktop and 390px mobile layout (no horizontal overflow), and shortlist message destination. JavaScript syntax checks passed. No message was sent.
+=======
+# AlQawiPerfumes
+Alqawi Perfumes – E-commerce Website  A modern, responsive e-commerce platform for a premium perfume store, featuring Standard and Premium fragrance collections
+>>>>>>> 115599d58c29326648f4c6bad096439f49a9787b
