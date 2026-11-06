@@ -22,7 +22,28 @@ document.addEventListener('click',e=>{const el=e.target.closest('button');if(!el
 $('#search').addEventListener('input',render);$('#reset').addEventListener('click',()=>{$('#search').value='';document.querySelector('[data-filter="All"]').click();});$('#bag-open').addEventListener('click',()=>{bag();$('#bag-dialog').showModal();});$('#privacy-open').addEventListener('click',()=>$('#privacy-dialog').showModal());
 document.querySelectorAll('dialog').forEach(d=>{d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}});});
 document.querySelectorAll('[data-whatsapp]').forEach(a=>{a.href=wa('Hello! I would like help choosing a perfume inspiration. Please share your collection details, prices and customisation options.');a.target='_blank';a.rel='noopener noreferrer';});$('#year').textContent=new Date().getFullYear();persist();
-if(!(window.CSS&&CSS.supports&&CSS.supports('animation-timeline','view()'))){const heroImg=document.querySelector('.hero-art>img');if(heroImg)new IntersectionObserver(([e])=>{if(e.isIntersecting)heroImg.classList.add('in-view');},{threshold:.3}).observe(heroImg);}
+// Spotlight hero: auto-advance + dots + arrows. Pause on hover, resume on leave.
+(() => {
+  const slides=[...document.querySelectorAll('.spotlight-slide')];
+  const dots=$('#spotlight-dots');
+  if(!slides.length||!dots)return;
+  let i=slides.findIndex(s=>s.classList.contains('active'));if(i<0)i=0;
+  let timer;const show=n=>{slides[i].classList.remove('active');i=(n+slides.length)%slides.length;slides[i].classList.add('active');[...dots.children].forEach((d,k)=>d.classList.toggle('active',k===i));const bottle=$('#feature-bottle');if(bottle){const img=slides[i].style.backgroundImage.match(/url\(['"]?(.+?)['"]?\)/);if(img)bottle.src=img[1];}};
+  slides.forEach((_,k)=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.setAttribute('aria-label',`Slide ${k+1}`);if(k===i)b.classList.add('active');b.addEventListener('click',()=>{show(k);restart();});dots.append(b);});
+  document.querySelectorAll('.spotlight-arrow').forEach(btn=>btn.addEventListener('click',()=>{show(i+Number(btn.dataset.slide));restart();}));
+  const start=()=>{timer=setInterval(()=>show(i+1),6500)};const restart=()=>{clearInterval(timer);start()};start();
+  const stage=document.querySelector('.spotlight-stage');stage?.addEventListener('mouseenter',()=>clearInterval(timer));stage?.addEventListener('mouseleave',start);
+})();
+
+// Featured bottle: pointer-driven 3D tilt. Degrades to no-op on touch devices.
+(() => {
+  const stage=$('#feature-stage'),bottle=$('#feature-bottle');
+  if(!stage||!bottle||matchMedia('(hover: none)').matches)return;
+  const max=10;
+  stage.addEventListener('pointermove',e=>{const r=stage.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5;const y=(e.clientY-r.top)/r.height-.5;bottle.style.transform=`rotateX(${-y*max}deg) rotateY(${x*max}deg) scale(1.04)`;});
+  stage.addEventListener('pointerleave',()=>{bottle.style.transform='rotateX(0) rotateY(0) scale(1.02)';});
+  stage.classList.add('loaded');
+})();
 
 // Inject Standard/Premium collection chips above the family filter.
 (() => {
