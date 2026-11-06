@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><meta name="robots" content="noindex"><title>Track your order — Alqawiperfumes</title><link rel="icon" href="assets/alqawi-bottle.png" type="image/png"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="shop.css"><script src="https://checkout.razorpay.com/v1/checkout.js" defer></script><script src="track.js" defer></script></head>
+<body>
+<header><a class="brand" href="index.html" aria-label="Alqawiperfumes home"><img src="assets/alqawi-logo.png" width="1254" height="1254" alt="Alqawiperfumes logo"></a></header>
+<main class="page-shell">
+<a class="back-link" href="index.html">← Back to collection</a>
+<h1>Track your order</h1>
+<p class="muted">Use the private tracking link we sent with your order. If you have it, paste the token from the <code>?t=</code> part of the URL below.</p>
+<form id="lookup-form"><div class="form-field"><label for="order-id">Tracking token</label><input id="order-id" required maxlength="60"></div><button type="submit" class="button dark">Find order</button></form>
+<p id="track-error" class="error-text" hidden></p>
+<div id="track-result" hidden></div>
+</main>
+</body></html>

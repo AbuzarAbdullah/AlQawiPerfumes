@@ -1,0 +1,32 @@
+// Editable catalog. Names are independent collection labels, not designer products.
+// sizes: available bottle sizes in ml. Per-size pricing is set later via the admin dashboard.
+window.PERFUME_CATALOG = [
+{id:'01',name:'Sacred Wood',brand:'Diptyque',inspiration:'Tam Dao',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'02',name:'Paradox Bloom',brand:'Prada',inspiration:'Paradoxe',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'03',name:'Midnight Journey',brand:'Louis Vuitton',inspiration:'Ombre Nomade',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'04',name:'Bold Elixir',brand:'Jean Paul Gaultier',inspiration:'Le Male Elixir',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'05',name:'Rose & Reverie',brand:'Ahmed Al Maghribi',inspiration:'Oud & Roses',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'06',name:'Beyond the Horizon',brand:'Amouage',inspiration:'Outlands',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'07',name:'Otherworld',brand:'Marc-Antoine Barrois',inspiration:'Ganymede',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'08',name:'Golden Hour',brand:'Xerjoff',inspiration:'Naxos',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'09',name:'After Hours',brand:'Giorgio Armani',inspiration:'Stronger With You Absolutely',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'10',name:'Blue Intention',brand:'Yves Saint Laurent',inspiration:'Y Eau de Parfum',family:'Fresh & bright',sizes:[10,30,50,100]},
+{id:'11',name:'Amber Embrace',brand:'Parfums de Marly',inspiration:'Althaïr',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'12',name:'Crimson Aura',brand:'Maison Francis Kurkdjian',inspiration:'Baccarat Rouge 540',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'13',name:'Golden Fortune',brand:'Paco Rabanne',inspiration:'One Million',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'14',name:'Wild Elixir',brand:'Dior',inspiration:'Sauvage Elixir',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'15',name:'Boundless Dream',brand:'Louis Vuitton',inspiration:'Imagination',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'16',name:'Leather Legacy',brand:'Tom Ford',inspiration:'Tuscan Leather',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'17',name:'Lavender Oud',brand:'Independent blend',inspiration:'Oudh & Lavender accord',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'18',name:'Velvet Orchard',brand:"Penhaligon's",inspiration:'Halfeti',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'19',name:'Smoke Interlude',brand:'Amouage',inspiration:'Interlude Man',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'20',name:'Satin Oud',brand:'Maison Francis Kurkdjian',inspiration:'Oud Satin Mood',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'21',name:'Velvet Ember',brand:'Tom Ford',inspiration:'Tobacco Vanille',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'22',name:'Tropical Oud',brand:'Maison Crivelli',inspiration:'Oud Maracujá',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'23',name:'Azure Signature',brand:'Chanel',inspiration:'Bleu de Chanel EDP',family:'Fresh & bright',sizes:[10,30,50,100]},
+{id:'24',name:'Intense Tobacco',brand:'Ormonde Jayne',inspiration:'Montabaco Intensivo',family:'Rich & woody',sizes:[10,30,50,100]},
+{id:'25',name:'Deep Horizon',brand:'Giorgio Armani',inspiration:'Acqua di Giò Profondo',family:'Fresh & bright',sizes:[10,30,50,100]},
+{id:'26',name:'Pure Garden',brand:'Xerjoff',inspiration:'Erba Pura',family:'Fresh & bright',sizes:[10,30,50,100]},
+{id:'27',name:'Desert Royale',brand:'Lattafa',inspiration:'Sabaya',family:'Warm & sweet',sizes:[10,30,50,100]},
+{id:'28',name:'Heritage Oud',brand:'Arabian Oud',inspiration:'Signature Oud Blend',family:'Rich & woody',sizes:[10,30,50,100]}
+];
