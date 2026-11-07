@@ -7,6 +7,11 @@ import mysql from 'mysql2/promise';
 function rewrite(sql) {
   return sql
     .replace(/datetime\('now'\)/gi, 'NOW()')
+    // date('now','-N days') -> CURDATE() - INTERVAL N DAY  (SQLite modifier, MariaDB interval)
+    .replace(/date\(\s*'now'\s*,\s*'([+-]?\d+)\s*days?'\s*\)/gi, (_, n) => `(CURDATE() ${n.startsWith('-') ? '-' : '+'} INTERVAL ${Math.abs(parseInt(n,10))} DAY)`)
+    .replace(/date\('now'\)/gi, 'CURDATE()')
+    // date(col) on a datetime -> DATE(col)
+    .replace(/\bdate\(([^')]+)\)/gi, 'DATE($1)')
     .replace(/\bINSERT\s+OR\s+IGNORE\b/gi, 'INSERT IGNORE')
     .replace(/\bON\s+CONFLICT\s*\([^)]*\)\s*DO\s+UPDATE\s+SET\b/gi, 'ON DUPLICATE KEY UPDATE')
     .replace(/\bexcluded\.(\w+)/gi, 'VALUES($1)')

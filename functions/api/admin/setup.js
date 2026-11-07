@@ -4,6 +4,8 @@ import { isNonEmptyString } from '../../_shared/validate.js';
 import { hashPassword } from '../../_shared/auth.js';
 
 export async function onRequestPost({ request, env }) {
+  // Must be explicitly enabled per-deploy so a fresh env can't be hijacked by whoever hits /setup first.
+  if (env.ADMIN_SETUP_ENABLED !== '1') return json({ error: 'Setup disabled' }, 403);
   const existing = await env.DB.prepare('SELECT COUNT(*) AS n FROM admin_users').first();
   if (existing.n > 0) return json({ error: 'Admin already exists — use login' }, 409);
 

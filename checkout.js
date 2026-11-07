@@ -26,9 +26,9 @@ function renderCart() {
   if (empty) { container.innerHTML = ''; $('#order-summary').innerHTML = ''; return; }
   container.innerHTML = cart.map((item, i) => `<div class="cart-line">
     <div><strong>${esc(item.name)}</strong><br><small>Inspired by ${esc(item.brand)}</small></div>
-    <select data-ml="${i}">${item.variants.map(v => `<option value="${v.ml}" ${v.ml === item.ml ? 'selected' : ''}>${v.ml}ml — ${inr(v.priceInr)}</option>`).join('')}</select>
-    <input type="number" min="1" max="20" value="${item.qty}" data-qty="${i}" style="width:55px">
     <span>${inr(lineTotal(item))}</span>
+    <select data-ml="${i}" aria-label="Size">${item.variants.map(v => `<option value="${v.ml}" ${v.ml === item.ml ? 'selected' : ''}>${v.ml}ml — ${inr(v.priceInr)}</option>`).join('')}</select>
+    <input type="number" min="1" max="20" value="${item.qty}" data-qty="${i}" aria-label="Quantity">
     <button type="button" data-remove="${i}" aria-label="Remove ${esc(item.name)}">Remove</button>
   </div>`).join('');
 
@@ -69,8 +69,10 @@ $('#checkout-form').addEventListener('submit', async e => {
   // Stable idempotency key: survives refreshes/retries of the same checkout attempt but regenerates after success.
   let idempotencyKey = sessionStorage.getItem('checkout-idem');
   if (!idempotencyKey) { idempotencyKey = crypto.randomUUID(); sessionStorage.setItem('checkout-idem', idempotencyKey); }
+  const paymentMethod = form.querySelector('[name="paymentMethod"]:checked')?.value || 'upi';
   const payload = {
     turnstileToken, idempotencyKey,
+    paymentMethod,
     customer: {
       name: form.name.value, phone: form.phone.value, email: form.email.value,
       addressLine1: form.address1.value, addressLine2: form.address2.value,
@@ -90,12 +92,16 @@ $('#checkout-form').addEventListener('submit', async e => {
     $('#cart-items').hidden = true;
     $('#order-summary').hidden = true;
     $('#checkout-result').hidden = false;
+    const payBlock = data.paymentMethod === 'cod'
+      ? `<p>You chose <strong>Cash on Delivery</strong>. We'll call to confirm, then dispatch.</p>`
+      : `<p>Pay via UPI, then submit the transaction ID + payment screenshot on your tracking page.</p>
+         <a class="button dark" href="${esc(data.upiLink || '#')}">Pay with UPI ↗</a>`;
     $('#checkout-result').innerHTML = `<h2>Order placed</h2>
       <p>Your order <strong>${esc(data.orderNumber || data.id)}</strong> for ${inr(data.totalInr)} has been received.</p>
-      <p>Pay via UPI to complete your order, then submit the payment reference on your tracking page.</p>
-      <a class="button dark" href="${data.upiLink}">Pay with UPI ↗</a>
-      <p><a href="${esc(data.trackUrl)}">Track your order and submit payment reference →</a></p>
-      <p class="muted">Keep this tracking link private — it is the only key to your order.</p>`;
+      ${data.trackingToken ? `<p class="muted">Your Order ID (save this to track your order):</p><p class="order-id-show">${esc(data.trackingToken)}</p>` : ''}
+      ${payBlock}
+      <p><a href="${esc(data.trackUrl)}">Track your order →</a></p>
+      <p class="muted">Keep this Order ID private — it is the only key to your order.</p>`;
   } catch (err) {
     errorEl.textContent = err.message;
     errorEl.hidden = false;

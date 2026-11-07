@@ -36,37 +36,13 @@ document.querySelectorAll('[data-tab]').forEach(btn => btn.addEventListener('cli
   document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b === btn));
   $('#tab-orders').hidden = btn.dataset.tab !== 'orders';
   $('#tab-products').hidden = btn.dataset.tab !== 'products';
-  $('#tab-inventory').hidden = btn.dataset.tab !== 'inventory';
-  if (btn.dataset.tab === 'inventory') loadInventory();
 }));
-
-async function loadInventory() {
-  const rows = await api('/api/admin/inventory');
-  $('#inventory-body').innerHTML = rows.map(r => `<tr>
-    <td>${esc(r.product_name)}</td>
-    <td>${esc(r.collection)}</td>
-    <td>${r.ml}ml</td>
-    <td><input type="number" min="0" value="${r.qty_available}" data-stock="${r.variant_id}" style="width:80px"></td>
-    <td>${r.reserved}</td>
-    <td>${r.qty_available - r.reserved}</td>
-  </tr>`).join('');
-}
-
-document.addEventListener('change', async e => {
-  if (!e.target.dataset.stock) return;
-  const qty = Math.max(0, Number(e.target.value) || 0);
-  try { await api(`/api/admin/inventory/${e.target.dataset.stock}`, { method: 'PATCH', body: JSON.stringify({ qtyAvailable: qty }) }); }
-  catch (ex) { alert(ex.message); }
-});
 
 async function loadAnalytics() {
   try {
     const r = await api('/api/admin/reports/sales');
     const t = r.totals || {};
     const tile = (label, value) => `<div class="tile"><span>${label}</span><strong>${value}</strong></div>`;
-    const low = r.lowStock.length
-      ? r.lowStock.map(l => `<li>${esc(l.product_name)} ${l.ml}ml — ${l.qty_available - l.reserved} free</li>`).join('')
-      : '<li class="muted">All variants above the low-stock threshold.</li>';
     $('#analytics').innerHTML = `<div class="tiles">
       ${tile('Total orders', t.total_orders || 0)}
       ${tile("Today's orders", r.todayOrders)}
@@ -76,8 +52,7 @@ async function loadAnalytics() {
       ${tile('Delivered', t.delivered_orders || 0)}
       ${tile('Verified revenue', inr(t.verified_revenue_inr || 0))}
       ${tile('Refunds', inr(t.refunds_inr || 0))}
-    </div>
-    <details><summary>Low stock (${r.lowStock.length})</summary><ul>${low}</ul></details>`;
+    </div>`;
   } catch {}
 }
 
@@ -87,8 +62,8 @@ async function loadOrders() {
 
   $('#orders-body').innerHTML = orders.map(o => {
     const pay = o.payment_status || 'pending';
-    const payActions = pay === 'submitted' || pay === 'pending'
-      ? `<button type="button" data-verify="${o.id}">Verify</button> <button type="button" data-reject="${o.id}">Reject</button>`
+    const payActions = pay === 'submitted' || pay === 'pending' || pay === 'cod_pending'
+      ? `<button type="button" data-verify="${o.id}">${pay === 'cod_pending' ? 'Mark paid (COD)' : 'Verify'}</button> <button type="button" data-reject="${o.id}">Reject</button>`
       : pay === 'paid'
         ? `<small>paid</small> <button type="button" data-refund="${o.id}" data-amt="${o.total_inr}">Refund</button>`
         : `<small>${esc(pay)}</small>`;
@@ -121,6 +96,11 @@ document.addEventListener('click', async e => {
     const reason = prompt('Cancellation reason (optional):') || '';
     try { await api(`/api/admin/orders/${c.dataset.cancel}/cancel`, { method: 'POST', body: JSON.stringify({ reason }) }); loadOrders(); } catch (ex) { alert(ex.message); }
   }
+  const ds = e.target.closest('[data-del-shot]');
+  if (ds) {
+    if (!confirm('Permanently delete this payment screenshot?')) return;
+    try { await api(`/api/admin/orders/${ds.dataset.delShot}?target=screenshot`, { method: 'DELETE' }); loadOrders(); } catch (ex) { alert(ex.message); }
+  }
   const rf = e.target.closest('[data-refund]');
   if (rf) {
     const amt = prompt(`Refund amount in ₹ (max ${rf.dataset.amt}):`, rf.dataset.amt);
@@ -146,9 +126,20 @@ document.addEventListener('click', async e => {
     const detailRow = $(`#detail-${viewBtn.dataset.view}`);
     if (!detailRow.hidden) { detailRow.hidden = true; return; }
     const order = await api(`/api/admin/orders/${viewBtn.dataset.view}`);
+    const pay = (order.payments || [])[0];
+    const payBlock = pay ? `
+      <div class="pay-detail">
+        <strong>Payment</strong><br>
+        Mode: ${esc(pay.method)} · Status: ${esc(pay.status)} · ₹${esc(pay.amount_inr)}<br>
+        Transaction ID: ${esc(pay.utr || order.utr_reference || '—')}<br>
+        ${pay.screenshot_data
+          ? `<a href="${esc(pay.screenshot_data)}" target="_blank" rel="noopener"><img src="${esc(pay.screenshot_data)}" alt="Payment screenshot" style="max-width:220px;border:1px solid #333;margin-top:6px"></a><br>
+             <button type="button" data-del-shot="${esc(order.id)}">Delete screenshot permanently</button>`
+          : '<em>No screenshot</em>'}
+      </div>` : '<em>No payment row</em>';
     row.innerHTML = `<strong>${esc(order.address_line1)}${order.address_line2 ? ', ' + esc(order.address_line2) : ''}, ${esc(order.city)}, ${esc(order.state)} ${esc(order.pincode)}</strong><br>
-      UTR: ${esc(order.utr_reference || '—')}<br>
-      ${order.items.map(i => `${esc(i.product_name)} (${i.ml}ml) × ${i.qty} — ${inr(i.line_total_inr)}`).join('<br>')}`;
+      ${order.items.map(i => `${esc(i.product_name)} (${i.ml}ml) × ${i.qty} — ${inr(i.line_total_inr)}`).join('<br>')}
+      ${payBlock}`;
     detailRow.hidden = false;
   }
 });
@@ -187,17 +178,7 @@ document.addEventListener('click', async e => {
   } catch (err) { alert(err.message); }
 });
 
-$('#add-product-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const form = e.target;
-  const errorEl = $('#product-error');
-  errorEl.hidden = true;
-  try {
-    await api('/api/admin/products', { method: 'POST', body: JSON.stringify({ id: form.id.value, name: form.name.value, brand: form.brand.value, inspiration: form.inspiration.value, family: form.family.value }) });
-    form.reset();
-    loadProducts();
-  } catch (err) { errorEl.textContent = err.message; errorEl.hidden = false; }
-});
+// Product catalog is fixed; add-product form removed from admin UI.
 
 // Probe session before loading; the 401 path auto-shows the login panel.
 loadOrders().then(() => { showAdmin(''); loadProducts(); }).catch(() => {});

@@ -61,6 +61,7 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
+  const paymentMethod = body.paymentMethod === 'cod' ? 'cod' : 'upi_manual';
   const subtotalInr = lineItems.reduce((s, i) => s + i.lineTotalInr, 0);
   const shippingInr = SHIPPING_FEE_INR;
   const totalInr = subtotalInr + shippingInr;
@@ -87,13 +88,14 @@ export async function onRequestPost({ request, env }) {
           customer_name, phone, email, address_line1, address_line2, city, state, pincode, delivery_instructions,
           subtotal_inr, shipping_inr, total_inr,
           status, payment_method, payment_status, customer_stage)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'placed', 'upi_manual', 'pending', 'confirmed')`
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'placed', ?, ?, 'confirmed')`
     ).bind(
       id, orderNum, tokenHash, idemKey,
       c.name.trim(), c.phone.trim(), c.email.trim(),
       c.addressLine1.trim(), (c.addressLine2 || '').trim() || null,
       c.city.trim(), c.state.trim(), c.pincode.trim(), deliveryInstructions,
       subtotalInr, shippingInr, totalInr,
+      paymentMethod, paymentMethod === 'cod' ? 'cod_pending' : 'pending',
     ),
     ...lineItems.map(i =>
       env.DB.prepare(
@@ -106,8 +108,8 @@ export async function onRequestPost({ request, env }) {
     ),
     // Pending UPI payment row; status only moves to VERIFIED after admin confirms.
     env.DB.prepare(
-      `INSERT INTO payments (order_id, method, status, amount_inr) VALUES (?, 'upi_manual', 'pending', ?)`
-    ).bind(id, totalInr),
+      `INSERT INTO payments (order_id, method, status, amount_inr) VALUES (?, ?, ?, ?)`
+    ).bind(id, paymentMethod, paymentMethod === 'cod' ? 'cod_pending' : 'pending', totalInr),
     env.DB.prepare(
       `INSERT INTO order_status_history (order_id, internal_status, customer_stage, note, actor)
        VALUES (?, 'awaiting_payment', 'confirmed', 'order created', 'customer')`
@@ -116,6 +118,8 @@ export async function onRequestPost({ request, env }) {
   await env.DB.batch(statements);
   await notifyOrder(env, id, 'order_confirmed').catch(() => {});
 
-  const upiLink = `upi://pay?pa=${encodeURIComponent(UPI_VPA)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${totalInr}&cu=INR&tn=${encodeURIComponent('Order ' + orderNum)}`;
-  return json({ id, orderNumber: orderNum, totalInr, upiLink, trackUrl: `/track.html?t=${token}` }, 201);
+  const upiLink = paymentMethod === 'upi_manual'
+    ? `upi://pay?pa=${encodeURIComponent(UPI_VPA)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${totalInr}&cu=INR&tn=${encodeURIComponent('Order ' + orderNum)}`
+    : null;
+  return json({ id, orderNumber: orderNum, totalInr, paymentMethod, upiLink, upiVpa: UPI_VPA, upiPayeeName: UPI_PAYEE_NAME, trackingToken: token, trackUrl: `/track.html?t=${token}` }, 201);
 }

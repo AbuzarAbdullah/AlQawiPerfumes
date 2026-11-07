@@ -1,9 +1,10 @@
-// base64url(random 24 bytes) → ~32-char opaque token; SHA-256 hex stored server-side.
-const b64url = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+// 10-digit numeric Order ID; SHA-256 hex stored server-side.
+// shortcut: 10 digits = ~33 bits of entropy, enough for a boutique catalog; upgrade to 12+ digits or add rate-limiting if order volume grows.
 export function newTrackingToken() {
-  const bytes = new Uint8Array(24);
+  const bytes = new Uint32Array(2);
   crypto.getRandomValues(bytes);
-  return b64url(bytes.buffer);
+  const n = ((BigInt(bytes[0]) << 32n) | BigInt(bytes[1])) % 10000000000n;
+  return n.toString().padStart(10, '0');
 }
 export async function hashToken(token) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));

@@ -1,13 +1,18 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><meta name="robots" content="noindex"><title>Track your order — Alqawiperfumes</title><link rel="icon" href="assets/alqawi-bottle.png" type="image/png"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="shop.css"><script src="https://checkout.razorpay.com/v1/checkout.js" defer></script><script src="track.js" defer></script></head>
-<body>
-<header><a class="brand" href="index.html" aria-label="Alqawiperfumes home"><img src="assets/alqawi-logo.png" width="1254" height="1254" alt="Alqawiperfumes logo"></a></header>
-<main class="page-shell">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><meta name="robots" content="noindex"><title>Track your order — Alqawiperfumes</title><link rel="icon" href="assets/alqawi-bottle.png" type="image/png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@300;400;500;700&display=swap"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="brand.css"><link rel="stylesheet" href="shop.css"><script src="track.js" defer></script></head>
+<body class="track-page" data-upi-vpa="yourupi@bank" data-upi-qr="assets/upi-qr.png">
+<a class="page-logo" href="index.html" aria-label="Alqawiperfumes home"><img src="assets/alqawi-logo.png" alt="Alqawiperfumes logo"></a>
+<main class="page-shell track-shell">
 <a class="back-link" href="index.html">← Back to collection</a>
-<h1>Track your order</h1>
-<p class="muted">Use the private tracking link we sent with your order. If you have it, paste the token from the <code>?t=</code> part of the URL below.</p>
-<form id="lookup-form"><div class="form-field"><label for="order-id">Tracking token</label><input id="order-id" required maxlength="60"></div><button type="submit" class="button dark">Find order</button></form>
+<p class="eyebrow">ORDER TRACKING</p>
+<h1 class="track-title">Track your <em>order.</em></h1>
+<p class="track-sub">Enter the 10-digit Order ID we sent with your confirmation. It's the private key to your order — keep it safe.</p>
+<form id="lookup-form" class="track-form">
+  <label class="order-id-field"><span>ORDER ID</span><input id="order-id" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" minlength="10" autocomplete="off" placeholder="0000000000"></label>
+  <button type="submit" class="button dark track-btn">Find my order <span>↗</span></button>
+</form>
 <p id="track-error" class="error-text" hidden></p>
+<details class="help-box"><summary>Where do I find my Order ID?</summary><p>Your 10-digit Order ID was shown on the checkout confirmation screen and sent to you on WhatsApp. You can also open the private link we sent — it ends in <code>?t=xxxxxxxxxx</code>. Bookmark that link, or save the 10 digits. Return here any time to see live status.</p></details>
 <div id="track-result" hidden></div>
 </main>
 </body></html>

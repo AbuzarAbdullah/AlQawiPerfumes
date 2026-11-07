@@ -3,6 +3,8 @@
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const inr = n => '₹' + n.toLocaleString('en-IN');
+const UPI_VPA = document.body.dataset.upiVpa || '';
+const UPI_QR = document.body.dataset.upiQr || '';
 
 const STAGES = ['confirmed', 'processing', 'shipped', 'out_for_delivery', 'delivered'];
 const STAGE_LABEL = {
@@ -10,8 +12,10 @@ const STAGE_LABEL = {
   out_for_delivery: 'Out for Delivery', delivered: 'Delivered', cancelled: 'Cancelled',
 };
 const PAY_LABEL = {
-  pending: 'Payment Pending', submitted: 'Payment Submitted', verified: 'Payment Verified',
-  paid: 'Payment Verified', failed: 'Payment Failed', rejected: 'Payment Failed',
+  pending: 'Payment Pending', submitted: 'Payment Submitted — awaiting admin confirmation',
+  verified: 'Payment Confirmed by Admin', paid: 'Payment Confirmed by Admin',
+  failed: 'Payment Failed', rejected: 'Payment Rejected',
+  cod_pending: 'Cash on Delivery',
   refund_pending: 'Refund Pending', refunded: 'Refunded',
 };
 
@@ -30,6 +34,20 @@ async function lookup(token) {
   }
 }
 
+// shortcut: downscale to 1600px JPEG q=0.82 so base64 stays under the 512KB server cap. Upgrade when R2 is wired.
+async function fileToDataUrl(file) {
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
+  await img.decode();
+  const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(img.width * scale);
+  canvas.height = Math.round(img.height * scale);
+  canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+  URL.revokeObjectURL(img.src);
+  return canvas.toDataURL('image/jpeg', 0.82);
+}
+
 function render(order, token) {
   const stage = order.customerStage;
   const idx = STAGES.indexOf(stage);
@@ -39,16 +57,17 @@ function render(order, token) {
 
   const canPay = order.paymentStatus === 'pending' || order.paymentStatus === 'failed' || order.paymentStatus === 'rejected';
   const payBlock = canPay ? `<div class="pay-options">
-      <h3>Pay now</h3>
-      <button type="button" id="pay-gateway" class="button dark">Pay online (card/UPI/netbanking)</button>
-      <details><summary>Or pay via UPI manually and submit the reference</summary>
-        <form id="utr-form">
-          <div class="form-field"><label for="utr">UPI transaction reference (UTR)</label><input id="utr" required maxlength="50"></div>
-          <button type="submit" class="button">Submit payment reference</button>
-          <p id="utr-error" class="error-text" hidden></p>
-        </form>
-      </details>
-    </div>` : order.paymentStatus === 'submitted' ? '<p class="muted">Payment reference received — we\'ll confirm it shortly.</p>' : '';
+      <h3>Pay via UPI</h3>
+      ${UPI_QR ? `<img class="upi-qr" src="${esc(UPI_QR)}" alt="UPI QR code for ${esc(UPI_VPA)}">` : ''}
+      <p>UPI ID: <strong>${esc(UPI_VPA)}</strong></p>
+      <p class="muted">After paying, enter your transaction ID and attach the payment screenshot below.</p>
+      <form id="utr-form">
+        <div class="form-field"><label for="utr">Transaction ID (UTR)</label><input id="utr" required inputmode="numeric" pattern="\\d{12,22}" maxlength="22" placeholder="12-digit UPI reference"></div>
+        <div class="form-field"><label for="screenshot">Payment screenshot</label><input id="screenshot" type="file" accept="image/png,image/jpeg,image/webp" required></div>
+        <button type="submit" class="button dark">Submit payment</button>
+        <p id="utr-error" class="error-text" hidden></p>
+      </form>
+    </div>` : '';
 
   $('#track-result').hidden = false;
   $('#track-result').innerHTML = `<h2>Order ${esc(order.orderNumber)}</h2>
@@ -62,60 +81,29 @@ function render(order, token) {
     <p class="muted">Last updated ${esc(order.updatedAt)}</p>
     ${payBlock}`;
 
-  const payBtn = $('#pay-gateway');
-  if (payBtn) payBtn.addEventListener('click', () => payWithGateway(token, order));
-
   const form = $('#utr-form');
   if (form) form.addEventListener('submit', async e => {
     e.preventDefault();
     const err = $('#utr-error');
     err.hidden = true;
+    const file = $('#screenshot').files[0];
     try {
+      if (!file) throw new Error('Attach a payment screenshot');
+      const screenshot = await fileToDataUrl(file);
       const res = await fetch(`/api/orders/track/${encodeURIComponent(token)}/utr`, {
         method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ utr: $('#utr').value }),
+        body: JSON.stringify({ utr: $('#utr').value, screenshot }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Could not submit reference');
+      if (!res.ok) throw new Error(data.error || 'Could not submit payment');
       lookup(token);
     } catch (e2) { err.textContent = e2.message; err.hidden = false; }
   });
 }
 
-async function payWithGateway(token, order) {
-  if (typeof Razorpay === 'undefined') { alert('Payment SDK did not load — try again in a moment.'); return; }
-  const res = await fetch('/api/payments/gateway/create', {
-    method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ trackingToken: token }),
-  });
-  const data = await res.json();
-  if (!res.ok) { alert(data.error || 'Could not start payment'); return; }
-  const rz = new Razorpay({
-    key: data.keyId, amount: data.amount, currency: data.currency,
-    name: 'Alqawiperfumes', description: `Order ${order.orderNumber}`,
-    order_id: data.gatewayOrderId,
-    handler: async r => {
-      const v = await fetch('/api/payments/gateway/verify', {
-        method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          trackingToken: token,
-          razorpayOrderId: r.razorpay_order_id,
-          razorpayPaymentId: r.razorpay_payment_id,
-          razorpaySignature: r.razorpay_signature,
-        }),
-      });
-      const vd = await v.json();
-      if (!v.ok) { alert(vd.error || 'Verification failed — if you were charged, contact support.'); return; }
-      lookup(token);
-    },
-    theme: { color: '#dab36a' },
-  });
-  rz.open();
-}
-
 $('#lookup-form').addEventListener('submit', e => { e.preventDefault(); lookup($('#order-id').value.trim()); });
 
 const qs = new URLSearchParams(location.search);
-const urlToken = qs.get('t') || qs.get('o'); // 'o' preserved as legacy alias
+const urlToken = qs.get('t') || qs.get('o');
 if (urlToken) { $('#order-id').value = urlToken; lookup(urlToken); }
 })();

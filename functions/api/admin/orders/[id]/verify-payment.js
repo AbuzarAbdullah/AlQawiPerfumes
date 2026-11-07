@@ -7,7 +7,7 @@ export async function onRequestPost({ env, params, data }) {
     'SELECT id, payment_status FROM orders WHERE id = ?'
   ).bind(params.id).first();
   if (!order) return json({ error: 'Order not found' }, 404);
-  if (!['submitted', 'pending'].includes(order.payment_status)) return badRequest(`Cannot verify from state ${order.payment_status}`);
+  if (!['submitted', 'pending', 'cod_pending'].includes(order.payment_status)) return badRequest(`Cannot verify from state ${order.payment_status}`);
 
   await env.DB.batch([
     env.DB.prepare(
@@ -16,7 +16,7 @@ export async function onRequestPost({ env, params, data }) {
     ).bind(params.id),
     env.DB.prepare(
       `UPDATE payments SET status = 'paid', verified_by = ?, verified_at = datetime('now'), updated_at = datetime('now')
-         WHERE order_id = ? AND method = 'upi_manual' AND status IN ('submitted', 'pending')`
+         WHERE order_id = ? AND method IN ('upi_manual', 'cod') AND status IN ('submitted', 'pending', 'cod_pending')`
     ).bind(actor, params.id),
     env.DB.prepare(
       `INSERT INTO order_status_history (order_id, internal_status, customer_stage, note, actor)

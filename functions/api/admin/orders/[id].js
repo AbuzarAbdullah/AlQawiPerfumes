@@ -13,7 +13,21 @@ export async function onRequestGet({ env, params }) {
   const { results: history } = await env.DB.prepare(
     'SELECT internal_status, customer_stage, note, actor, created_at FROM order_status_history WHERE order_id = ? ORDER BY id DESC'
   ).bind(params.id).all();
-  return json({ ...order, items, history });
+  const { results: payments } = await env.DB.prepare(
+    'SELECT id, method, status, amount_inr, utr, screenshot_data, gateway_payment_id, verified_at, created_at FROM payments WHERE order_id = ? ORDER BY id DESC'
+  ).bind(params.id).all();
+  return json({ ...order, items, history, payments });
+}
+
+export async function onRequestDelete({ env, params, request }) {
+  // Only supports ?target=screenshot — permanent wipe of the payment screenshot.
+  const target = new URL(request.url).searchParams.get('target');
+  if (target !== 'screenshot') return badRequest('Unsupported delete target');
+  const res = await env.DB.prepare(
+    `UPDATE payments SET screenshot_data = NULL, updated_at = datetime('now')
+       WHERE order_id = ? AND screenshot_data IS NOT NULL`
+  ).bind(params.id).run();
+  return json({ ok: true, cleared: res.meta.changes });
 }
 
 export async function onRequestPatch({ request, env, params, data }) {

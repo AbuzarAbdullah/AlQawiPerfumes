@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><meta name="robots" content="noindex"><title>Checkout — Alqawiperfumes</title><link rel="icon" href="assets/alqawi-bottle.png" type="image/png"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="brand.css"><link rel="stylesheet" href="shop.css"><script src="catalog.js" defer></script><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script><script src="checkout.js" defer></script></head>
 <body>
-<header><a class="brand" href="index.html" aria-label="Alqawiperfumes home"><img src="assets/alqawi-logo.png" width="1254" height="1254" alt="Alqawiperfumes logo"></a></header>
+<a class="page-logo" href="index.html" aria-label="Alqawiperfumes home"><img src="assets/alqawi-logo.png" alt="Alqawiperfumes logo"></a>
 <main class="page-shell">
 <a class="back-link" href="index.html">← Back to collection</a>
 <h1>Checkout</h1>
@@ -21,6 +21,10 @@
 <div class="form-field"><label for="pincode">Pincode</label><input id="pincode" name="pincode" required maxlength="6" inputmode="numeric" pattern="[0-9]{6}" placeholder="560001"></div>
 </div>
 <div class="form-field"><label for="instructions">Delivery instructions (optional)</label><textarea id="instructions" name="instructions" maxlength="500" rows="2" placeholder="Landmark, preferred delivery time, gate code..."></textarea></div>
+</section>
+<section class="card"><h2>Payment method</h2>
+<label class="pay-choice"><input type="radio" name="paymentMethod" value="upi" checked> Pay via UPI — scan QR + submit payment screenshot</label>
+<label class="pay-choice"><input type="radio" name="paymentMethod" value="cod"> Cash on Delivery</label>
 </section>
 <section class="card"><h2>Confirm &amp; pay</h2>
 <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
