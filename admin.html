@@ -1,46 +1,48 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><meta name="robots" content="noindex"><title>Admin — Alqawiperfumes</title><link rel="icon" href="assets/alqawi-bottle.png" type="image/png"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="shop.css"><script src="admin.js" defer></script></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><meta name="robots" content="noindex"><title>Admin — Alqawiperfumes</title><link rel="icon" href="assets/alqawi-bottle.png" type="image/png"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="brand.css"><link rel="stylesheet" href="shop.css"><script src="admin.js" defer></script></head>
 <body>
 <header><a class="brand" href="index.html" aria-label="Alqawiperfumes home"><img src="assets/alqawi-logo.png" width="1254" height="1254" alt="Alqawiperfumes logo"></a></header>
 <main class="page-shell wide">
 <h1>Admin dashboard</h1>
-<section id="login-section" hidden>
-  <h2>Sign in</h2>
+<section id="login-section" class="card auth-card" hidden>
+  <h1>Sign in</h1>
+  <p class="muted">Admin dashboard access</p>
   <form id="login-form">
-    <div class="form-field"><label for="login-username">Username</label><input id="login-username" required autocomplete="username"></div>
-    <div class="form-field"><label for="login-password">Password</label><input id="login-password" type="password" required autocomplete="current-password"></div>
-    <button type="submit" class="button dark">Sign in</button>
+    <div class="form-field"><label for="login-username">Username</label><input id="login-username" required autocomplete="username" placeholder="admin"></div>
+    <div class="form-field"><label for="login-password">Password</label><input id="login-password" type="password" required autocomplete="current-password" placeholder="••••••••••"></div>
+    <button type="submit" class="button dark">Sign in <span>↗</span></button>
     <p id="login-error" class="error-text" hidden></p>
   </form>
-  <p class="muted">First-time setup: <code>POST /api/admin/setup</code> with <code>{username, password}</code>.</p>
+  <p class="muted" style="font-size:11px;margin-top:20px">First-time setup: <code>POST /api/admin/setup</code> with <code>{username, password}</code>.</p>
 </section>
 <section id="admin-body" hidden>
 <p class="muted">Signed in as <span id="admin-who"></span> · <button id="logout-btn" type="button">Sign out</button></p>
 <div id="analytics"></div>
 <div class="admin-tabs"><button data-tab="orders" class="active">Orders</button><button data-tab="products">Products &amp; prices</button><button data-tab="inventory">Inventory</button></div>
 
-<section id="tab-orders">
+<section id="tab-orders" class="card">
+<h2>Orders</h2>
 <table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Phone</th><th>Total</th><th>Status</th><th>Payment</th><th>Placed</th><th></th></tr></thead><tbody id="orders-body"></tbody></table>
 </section>
 
-<section id="tab-inventory" hidden>
+<section id="tab-inventory" class="card" hidden>
 <h2>Inventory</h2>
 <p class="muted">Set the per-variant stock on hand. Orders then decrement the <em>reserved</em> column; free = available − reserved. Flip <code>ENFORCE_INVENTORY</code> once every row has a real number.</p>
 <table class="admin-table"><thead><tr><th>Product</th><th>Collection</th><th>Size</th><th>On hand</th><th>Reserved</th><th>Free</th></tr></thead><tbody id="inventory-body"></tbody></table>
 </section>
 
-<section id="tab-products" hidden>
+<section id="tab-products" class="card" hidden>
 <h2>Add product</h2>
 <form id="add-product-form" class="form-row">
-<div class="form-field"><label>id (slug)</label><input name="id" required pattern="[a-z0-9-]+"></div>
-<div class="form-field"><label>Name</label><input name="name" required></div>
-<div class="form-field"><label>Brand</label><input name="brand" required></div>
-<div class="form-field"><label>Inspiration</label><input name="inspiration" required></div>
-<div class="form-field"><label>Family</label><input name="family" required></div>
+<div class="form-field"><label>id (slug)</label><input name="id" required pattern="[a-z0-9-]+" placeholder="sacred-wood"></div>
+<div class="form-field"><label>Name</label><input name="name" required placeholder="Sacred Wood"></div>
+<div class="form-field"><label>Brand</label><input name="brand" required placeholder="Diptyque"></div>
+<div class="form-field"><label>Inspiration</label><input name="inspiration" required placeholder="Tam Dao"></div>
+<div class="form-field"><label>Family</label><input name="family" required placeholder="Rich &amp; woody"></div>
 <button type="submit" class="button dark">Add</button>
 </form>
 <p id="product-error" class="error-text" hidden></p>
-<h2>Products</h2>
+<h2 style="margin-top:28px">Products</h2>
 <table class="admin-table"><thead><tr><th>Product</th><th>Size</th><th>Price (₹)</th><th>Active</th><th></th></tr></thead><tbody id="products-body"></tbody></table>
 </section>
 </section>

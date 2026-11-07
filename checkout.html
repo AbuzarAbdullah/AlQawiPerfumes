@@ -1,30 +1,33 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><meta name="robots" content="noindex"><title>Checkout — Alqawiperfumes</title><link rel="icon" href="assets/alqawi-bottle.png" type="image/png"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="shop.css"><script src="catalog.js" defer></script><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script><script src="checkout.js" defer></script></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090909"><meta name="robots" content="noindex"><title>Checkout — Alqawiperfumes</title><link rel="icon" href="assets/alqawi-bottle.png" type="image/png"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="brand.css"><link rel="stylesheet" href="shop.css"><script src="catalog.js" defer></script><script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script><script src="checkout.js" defer></script></head>
 <body>
 <header><a class="brand" href="index.html" aria-label="Alqawiperfumes home"><img src="assets/alqawi-logo.png" width="1254" height="1254" alt="Alqawiperfumes logo"></a></header>
 <main class="page-shell">
 <a class="back-link" href="index.html">← Back to collection</a>
 <h1>Checkout</h1>
-<div id="cart-items"></div>
+<section class="card" id="cart-card"><h2>Your selection</h2><div id="cart-items"></div></section>
 <p id="empty-cart" class="muted" hidden>Your selection is empty. <a href="index.html#collection">Browse the collection</a>.</p>
-<div id="order-summary"></div>
+<section class="card" id="summary-card"><h2>Order summary</h2><div id="order-summary"></div></section>
 <form id="checkout-form">
-<h2>Delivery details</h2>
-<div class="form-field"><label for="name">Full name</label><input id="name" name="name" required maxlength="100"></div>
-<div class="form-field"><label for="phone">Phone (10-digit Indian mobile)</label><input id="phone" name="phone" required maxlength="15" placeholder="98765 43210"></div>
+<section class="card"><h2>Delivery details</h2>
+<div class="form-field"><label for="name">Full name</label><input id="name" name="name" required maxlength="100" placeholder="Your name"></div>
+<div class="form-field"><label for="phone">Phone (10-digit Indian mobile)</label><input id="phone" name="phone" required maxlength="15" placeholder="98765 43210" inputmode="tel"></div>
 <div class="form-field"><label for="email">Email</label><input id="email" name="email" type="email" required maxlength="200" placeholder="you@example.com"></div>
-<div class="form-field"><label for="address1">Address</label><input id="address1" name="address1" required maxlength="200"></div>
-<div class="form-field"><label for="address2">Address line 2 (optional)</label><input id="address2" name="address2" maxlength="200"></div>
+<div class="form-field"><label for="address1">Address</label><input id="address1" name="address1" required maxlength="200" placeholder="House, street"></div>
+<div class="form-field"><label for="address2">Address line 2 (optional)</label><input id="address2" name="address2" maxlength="200" placeholder="Apartment, landmark"></div>
 <div class="form-row">
-<div class="form-field"><label for="city">City</label><input id="city" name="city" required maxlength="100"></div>
-<div class="form-field"><label for="state">State</label><input id="state" name="state" required maxlength="100"></div>
-<div class="form-field"><label for="pincode">Pincode</label><input id="pincode" name="pincode" required maxlength="6" inputmode="numeric"></div>
+<div class="form-field"><label for="city">City</label><input id="city" name="city" required maxlength="100" placeholder="City"></div>
+<div class="form-field"><label for="state">State</label><input id="state" name="state" required maxlength="100" placeholder="State"></div>
+<div class="form-field"><label for="pincode">Pincode</label><input id="pincode" name="pincode" required maxlength="6" inputmode="numeric" pattern="[0-9]{6}" placeholder="560001"></div>
 </div>
 <div class="form-field"><label for="instructions">Delivery instructions (optional)</label><textarea id="instructions" name="instructions" maxlength="500" rows="2" placeholder="Landmark, preferred delivery time, gate code..."></textarea></div>
-<div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY"></div>
+</section>
+<section class="card"><h2>Confirm &amp; pay</h2>
+<div class="cf-turnstile" data-sitekey="1x00000000000000000000AA"></div>
 <p id="checkout-error" class="error-text" hidden></p>
 <button type="submit" class="button dark" id="place-order">Place order <span>↗</span></button>
+</section>
 </form>
-<div id="checkout-result" hidden></div>
+<div id="checkout-result" class="card" hidden></div>
 </main>
 </body></html>

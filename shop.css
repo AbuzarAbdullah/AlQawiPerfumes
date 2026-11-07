@@ -20,3 +20,79 @@
 .admin-tabs button{border:1px solid var(--line);background:none;padding:8px 16px;font-size:11px;border-radius:30px}
 .admin-tabs button.active{background:var(--ink);color:var(--paper)}
 [hidden]{display:none!important}
+
+/* ---------- Polish pass: nothing new; cleaner hierarchy, spacing, focus states. ---------- */
+.page-shell h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(34px,4vw,54px);letter-spacing:-1.5px;margin:18px 0 6px}
+.page-shell h2{font-family:Georgia,'Times New Roman',serif;font-size:22px;letter-spacing:-.4px;margin:0 0 18px;color:var(--ink)}
+.page-shell .back-link{display:inline-block;margin-bottom:8px;color:var(--muted)}
+.page-shell .back-link:hover{color:var(--gold)}
+
+.card{background:color-mix(in srgb,var(--paper) 94%,var(--ink) 6%);border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin:22px 0;box-shadow:0 1px 0 color-mix(in srgb,var(--line) 60%,transparent)}
+.card>h2:first-child,.card>h3:first-child{margin-top:0}
+
+.form-field{margin-bottom:18px}
+.form-field label{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);font-weight:500}
+.form-field input,.form-field select,.form-field textarea{border-radius:10px;padding:12px 14px;font-size:13.5px;transition:border-color .18s,box-shadow .18s,background .18s}
+.form-field input:hover,.form-field select:hover,.form-field textarea:hover{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}
+.form-field input:focus,.form-field select:focus,.form-field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 22%,transparent)}
+.form-field input:invalid:not(:placeholder-shown){border-color:color-mix(in srgb,#b3261e 70%,var(--line))}
+.form-field textarea{resize:vertical;min-height:70px}
+
+.cart-line{padding:16px 0;gap:14px;font-size:13px}
+.cart-line>div:first-child{flex:1;min-width:0}
+.cart-line strong{display:block;font-family:Georgia,serif;font-size:16px;letter-spacing:.2px;margin-bottom:2px}
+.cart-line small{color:var(--muted);font-size:11px}
+.cart-line select,.cart-line input[type=number]{border-radius:8px;padding:8px 10px;font-size:12px;transition:border-color .18s,box-shadow .18s}
+.cart-line select:focus,.cart-line input[type=number]:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 22%,transparent)}
+.cart-line>span{min-width:72px;text-align:right;font-weight:500}
+.cart-line [data-remove]{color:var(--muted);text-decoration:underline;text-underline-offset:3px;background:none;border:0;font-size:11px;padding:4px 2px}
+.cart-line [data-remove]:hover{color:var(--gold)}
+
+#order-summary .cart-line{border-bottom:1px dashed color-mix(in srgb,var(--line) 70%,transparent);font-size:13px;padding:10px 0}
+#order-summary .cart-line:last-of-type{border-bottom:0}
+.order-total{font-family:Georgia,serif;font-size:19px;letter-spacing:-.3px;border-top:1px solid var(--gold);padding-top:18px;margin-top:12px}
+.order-total span:last-child{color:var(--gold);font-weight:600}
+
+#checkout-form .button,#checkout-form .button.dark{margin-top:12px;min-height:52px;font-size:12px;letter-spacing:1.2px}
+.cf-turnstile{margin:10px 0 18px}
+.error-text{font-size:12px;padding:10px 14px;background:color-mix(in srgb,#b3261e 10%,transparent);border:1px solid color-mix(in srgb,#b3261e 35%,var(--line));border-radius:8px;margin:8px 0}
+
+#checkout-result{text-align:center;padding:30px 10px}
+#checkout-result h2{font-size:32px;color:var(--gold)}
+#checkout-result .button{margin:14px 0}
+
+/* Admin polish */
+.admin-table thead th{font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);font-weight:500;padding:12px 8px}
+.admin-table tbody tr:hover{background:color-mix(in srgb,var(--gold) 6%,transparent)}
+.admin-table td{padding:14px 8px}
+.admin-table input{border-radius:8px;transition:border-color .18s,box-shadow .18s}
+.admin-table input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 22%,transparent)}
+
+.status-badge{border-radius:30px;padding:5px 12px;font-weight:600;border:1px solid var(--line)}
+.status-badge.pending,.status-badge.placed,.status-badge.confirmed{background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);border-color:color-mix(in srgb,var(--gold) 50%,var(--line))}
+.status-badge.processing,.status-badge.utr_submitted,.status-badge.submitted{background:color-mix(in srgb,#5b8def 18%,transparent);color:#8db2ff;border-color:color-mix(in srgb,#5b8def 50%,var(--line))}
+.status-badge.paid,.status-badge.verified,.status-badge.delivered,.status-badge.completed{background:color-mix(in srgb,#2fb57b 18%,transparent);color:#8be0b5;border-color:color-mix(in srgb,#2fb57b 50%,var(--line))}
+.status-badge.cancelled,.status-badge.rejected,.status-badge.failed{background:color-mix(in srgb,#b3261e 18%,transparent);color:#f0a9a4;border-color:color-mix(in srgb,#b3261e 50%,var(--line))}
+
+.admin-tabs button{min-height:40px;transition:background .18s,color .18s,border-color .18s}
+.admin-tabs button:hover:not(.active){border-color:var(--gold);color:var(--gold)}
+
+/* Login/setup centered card */
+.auth-card{max-width:400px;margin:60px auto 0;padding:34px 30px}
+.auth-card h1{font-size:28px;margin-bottom:6px}
+.auth-card p.muted{font-size:12px;color:var(--muted);margin-bottom:22px}
+.auth-card .button{width:100%;justify-content:center;gap:10px}
+
+/* Selection dialog (home page "My selection") */
+.bag-item{padding:18px 4px;gap:22px}
+.bag-item h3{font-family:Georgia,serif;font-size:20px;letter-spacing:.1px}
+.bag-item p{font-size:12px;line-height:1.55}
+.bag-item .bag-price{color:var(--gold);font-weight:500;letter-spacing:.3px;font-size:11.5px}
+.bag-item>button{color:var(--muted);transition:color .18s}
+.bag-item>button:hover{color:var(--gold)}
+
+@media(max-width:700px){
+  .card{padding:20px 18px;border-radius:12px}
+  .cart-line{flex-wrap:wrap;gap:10px}
+  .cart-line>span{flex-basis:100%;text-align:right}
+}

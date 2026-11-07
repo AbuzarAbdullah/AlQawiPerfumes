@@ -18,9 +18,12 @@ function lineTotal(item) {
 
 function renderCart() {
   const container = $('#cart-items');
-  $('#empty-cart').hidden = cart.length !== 0;
-  $('#checkout-form').hidden = cart.length === 0;
-  if (!cart.length) { container.innerHTML = ''; $('#order-summary').innerHTML = ''; return; }
+  const empty = cart.length === 0;
+  $('#empty-cart').hidden = !empty;
+  $('#checkout-form').hidden = empty;
+  $('#cart-card').hidden = empty;
+  $('#summary-card').hidden = empty;
+  if (empty) { container.innerHTML = ''; $('#order-summary').innerHTML = ''; return; }
   container.innerHTML = cart.map((item, i) => `<div class="cart-line">
     <div><strong>${esc(item.name)}</strong><br><small>Inspired by ${esc(item.brand)}</small></div>
     <select data-ml="${i}">${item.variants.map(v => `<option value="${v.ml}" ${v.ml === item.ml ? 'selected' : ''}>${v.ml}ml — ${inr(v.priceInr)}</option>`).join('')}</select>
